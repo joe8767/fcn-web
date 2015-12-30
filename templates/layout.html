@@ -1,0 +1,17 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+{% block head %}
+<title>{% block title %}{% endblock %} - Cell Image Analysis</title>
+{% endblock %}
+<script type="text/javascript"
+  src="{{ url_for('static', filename='jquery/jquery-1.11.3.min.js') }}"></script>
+<script type="text/javascript">
+  var $SCRIPT_ROOT = {{ request.script_root|tojson|safe}};
+</script>
+</head>
+<body>
+{% block body %}
+{% endblock %}
+</body>
+</html>

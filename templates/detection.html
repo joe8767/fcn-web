@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% block title %}细胞分裂检测{% endblock %}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+  <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+  <script type="text/javascript">
+          function submitForm() {
+              //alert('test submitForm');
+              console.log("submit event");
+              var fd = new FormData(document.getElementById("fileinfo"));
+              fd.append("label", "WEBUPLOAD");
+              console.log();
+              $.ajax({
+                url: "/detection",
+                type: "POST",
+                data: fd,
+                enctype: 'multipart/form-data',
+                processData: false,  // tell jQuery not to process the data
+                contentType: false   // tell jQuery not to set contentType
+              }).done(function( data ) {
+                  console.log("Flask Output:");
+                  console.log( data );
+                  // $('#originalImage').html(data.originalImage);
+                  $('#originalImage').attr('src', data.originalImage);
+                  $('#segmentedImage').attr('src', data.detectedImage);
+                  if(typeof(data.msg)!="undefined")
+                  {
+                    alert(data.msg);
+                  }
+              });
+              return false;
+          }
+      </script>
+{% endblock %}
+{% block body %}
+<div class="container">
+  <div class="jumbotron">
+    <h1>细胞分裂检测</h1>
+    <p>基于深度神经网络的细胞分裂检测</p>
+  </div>
+  <div class="row">
+
+    <div class="col-sm-4">
+      <h1>选择文件</h1>
+      <div id="uploader">
+        <form action="" id="fileinfo" method=post enctype=multipart/form-data onsubmit="return submitForm();">
+        <p><input type=file name=file>
+        <input id="send_upload_request" type=submit value=Upload>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <h3>原图像</h3>
+      <div id="original">
+        <img id="originalImage" width="300" height="300"/>
+      </div>
+    </div>
+
+    <div class="col-sm-4">
+      <h3>分裂检测结果</h3>
+      <div id="segmented">
+        <img id="segmentedImage" width="300" height="300"/>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

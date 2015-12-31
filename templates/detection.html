@@ -2,7 +2,15 @@
 {% block title %}细胞分裂检测{% endblock %}
 {% block head %}
   {{ super() }}
+  <style type="text/css">
+    #original ul{margin: 0; padding: 0; }
+    #original ul li{list-style: none; margin: 10px;}
+    #original ul li img{list-style: none; margin: 10px; height:200px; width: 200px;}
 
+    #detected ul{margin: 0; padding: 0; }
+    #detected ul li{list-style: none; margin: 10px;}
+    #detected ul li img{list-style: none; margin: 10px; height:200px; width: 200px;}
+  </style>
   <script type="text/javascript" src="{{ url_for('static', filename='jquery/jquery.js') }}"></script>
   <script type="text/javascript"> var $SCRIPT_ROOT = {{ request.script_root|tojson|safe}}; </script>
 
@@ -12,10 +20,74 @@
   <script src="{{ url_for('static', filename='colorbox/jquery.colorbox.js') }}"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='colorbox/colorbox.css') }}" type="text/css" media="screen">
 
+  <script>
+      $(document).ready(function(){
+        console.log( 'ready function loaded' );
+        //Examples of how to assign the Colorbox event to elements
+        $(".group1").colorbox({rel:'group1'});
+        $(".group2").colorbox({rel:'group2', transition:"fade"});
+        $(".group3").colorbox({rel:'group3', transition:"none", width:"75%", height:"75%"});
+        $(".group4").colorbox({rel:'group4', slideshow:true});
+        $(".ajax").colorbox();
+        $(".youtube").colorbox({iframe:true, innerWidth:640, innerHeight:390});
+        $(".vimeo").colorbox({iframe:true, innerWidth:500, innerHeight:409});
+        $(".iframe").colorbox({iframe:true, width:"80%", height:"80%"});
+        $(".inline").colorbox({inline:true, width:"50%"});
+        $(".callbacks").colorbox({
+          onOpen:function(){ alert('onOpen: colorbox is about to open'); },
+          onLoad:function(){ alert('onLoad: colorbox has started to load the targeted content'); },
+          onComplete:function(){ alert('onComplete: colorbox has displayed the loaded content'); },
+          onCleanup:function(){ alert('onCleanup: colorbox has begun the close process'); },
+          onClosed:function(){ alert('onClosed: colorbox has completely closed'); }
+        });
+
+        $('.non-retina').colorbox({rel:'group5', transition:'none'})
+        $('.retina').colorbox({rel:'group5', transition:'none', retinaImage:true, retinaUrl:true});
+
+        //Example of preserving a JavaScript event for inline calls.
+        $("#click").click(function(){
+          $('#click').css({"background-color":"#f00", "color":"#fff", "cursor":"inherit"}).text("Open this window again and this message will still be here.");
+          return false;
+        });
+      });
+
+      function bindColorBox(){
+        //Examples of how to assign the Colorbox event to elements
+        $(".group1").colorbox({rel:'group1'});
+        $(".group2").colorbox({rel:'group2', transition:"fade"});
+        $(".group3").colorbox({rel:'group3', transition:"none", width:"75%", height:"75%"});
+        $(".group4").colorbox({rel:'group4', slideshow:true});
+        $(".ajax").colorbox();
+        $(".youtube").colorbox({iframe:true, innerWidth:640, innerHeight:390});
+        $(".vimeo").colorbox({iframe:true, innerWidth:500, innerHeight:409});
+        $(".iframe").colorbox({iframe:true, width:"80%", height:"80%"});
+        $(".inline").colorbox({inline:true, width:"50%"});
+        $(".callbacks").colorbox({
+          onOpen:function(){ alert('onOpen: colorbox is about to open'); },
+          onLoad:function(){ alert('onLoad: colorbox has started to load the targeted content'); },
+          onComplete:function(){ alert('onComplete: colorbox has displayed the loaded content'); },
+          onCleanup:function(){ alert('onCleanup: colorbox has begun the close process'); },
+          onClosed:function(){ alert('onClosed: colorbox has completely closed'); }
+        });
+
+        $('.non-retina').colorbox({rel:'group5', transition:'none'})
+        $('.retina').colorbox({rel:'group5', transition:'none', retinaImage:true, retinaUrl:true});
+
+        //Example of preserving a JavaScript event for inline calls.
+        $("#click").click(function(){
+          $('#click').css({"background-color":"#f00", "color":"#fff", "cursor":"inherit"}).text("Open this window again and this message will still be here.");
+          return false;
+        });
+        return true;
+      };
+
+    </script>
+
   <script type="text/javascript">
           function submitForm() {
               //alert('test submitForm');
               console.log("submit event");
+              // var fd = new FormData(document.getElementById("fileinfo"));
               var fd = new FormData(document.getElementById("fileinfo"));
               fd.append("label", "WEBUPLOAD");
               console.log();
@@ -34,9 +106,8 @@
                   console.log( data.detectedImage[0] );
                   for(var i=0; i<data.originalImage.length; i++)
                   {
-                    $('#original>ul').append('<li><a href={{ url_for('static', filename='images/1.png') }} title="{{ url_for('static', filename='images/1.png') }}" class="group4"><img src={{ url_for('static', filename=images/1.png') }} /></a></li>');
-                    $('#originalImage').attr('src', data.originalImage);
-                    $('#segmentedImage').attr('src', data.detectedImage);
+                    $('#original>ul').append('<li><a href=' + data.originalImage[i] + ' title=' + data.originalImage[i] + ' class="group4" onclick="return bindColorBox();"><img src=' + data.originalImage[i] + ' /></a></li>');
+                    $('#detected>ul').append('<li><a href=' + data.detectedImage[i] + ' title=' + data.detectedImage[i] + ' class="group4" onclick="return bindColorBox();"><img src=' + data.detectedImage[i] + ' /></a></li>');
                   }
 
                   if(typeof(data.msg)!="undefined")
@@ -45,6 +116,21 @@
                   }
               });
               return false;
+          }
+
+          function addInput()
+          {
+            console.log('addInput');
+            $('#input_boxes').append('<p><input type=file name=file><button type="button" class="btn btn-danger btn-sm" onclick="return removeInput(this);">取消</button></p>');
+            return false;
+          }
+
+          function removeInput(obj)
+          {
+            console.log('removeInput');
+            console.log(obj);
+            $(obj).parent('p').remove();
+            return false;
           }
       </script>
 {% endblock %}
@@ -61,9 +147,14 @@
       <h1>选择文件</h1>
       <div id="uploader">
         <form action="" id="fileinfo" method=post enctype=multipart/form-data onsubmit="return submitForm();">
-        <p><input type=file name=file></p>
-        <p><input type=file name=file></p>
-        <input id="send_upload_request" type=submit value=Upload>
+        <div id="input_boxes">
+          <p><input type=file name=file></p>
+          <p><input type=file name=file></p>
+        </div>
+        <p><button type="button" class="btn btn-success btn-info" onclick="return addInput();">更多文件...</button></p>
+        <!-- <p><input id="send_upload_request" type=submit value=Upload></p> -->
+        <button type="button" class="btn btn-success"onclick="return submitForm();">检 测 分 析</button>
+
         </form>
       </div>
     </div>
@@ -72,15 +163,17 @@
       <h3>原图像</h3>
       <div id="original">
         <ul>
-          <li><a href={{ url_for('static', filename='images/1.png') }} title="{{ url_for('static', filename='images/1.png') }}" class="group4"><img src={{ url_for('static', filename='images/1.png') }} /></a></li>
+
         </ul>
       </div>
     </div>
 
     <div class="col-sm-4">
       <h3>分裂检测结果</h3>
-      <div id="segmented">
-        <img id="segmentedImage" width="300" height="300"/>
+      <div id="detected">
+        <ul>
+
+        </ul>
       </div>
     </div>
   </div>

@@ -2,8 +2,46 @@
 {% block title %}细胞分割{% endblock %}
 {% block head %}
   {{ super() }}
+  <script type="text/javascript" src="{{ url_for('static', filename='jquery/jquery.js') }}"></script>
+  <script type="text/javascript"> var $SCRIPT_ROOT = {{ request.script_root|tojson|safe}}; </script>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
   <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='colorbox/jquery.colorbox.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='colorbox/colorbox.css') }}" type="text/css" media="screen">
+
+  <script>
+      $(document).ready(function(){
+        //Examples of how to assign the Colorbox event to elements
+        $(".group1").colorbox({rel:'group1'});
+        $(".group2").colorbox({rel:'group2', transition:"fade"});
+        $(".group3").colorbox({rel:'group3', transition:"none", width:"75%", height:"75%"});
+        $(".group4").colorbox({rel:'group4', slideshow:true});
+        $(".ajax").colorbox();
+        $(".youtube").colorbox({iframe:true, innerWidth:640, innerHeight:390});
+        $(".vimeo").colorbox({iframe:true, innerWidth:500, innerHeight:409});
+        $(".iframe").colorbox({iframe:true, width:"80%", height:"80%"});
+        $(".inline").colorbox({inline:true, width:"50%"});
+        $(".callbacks").colorbox({
+          onOpen:function(){ alert('onOpen: colorbox is about to open'); },
+          onLoad:function(){ alert('onLoad: colorbox has started to load the targeted content'); },
+          onComplete:function(){ alert('onComplete: colorbox has displayed the loaded content'); },
+          onCleanup:function(){ alert('onCleanup: colorbox has begun the close process'); },
+          onClosed:function(){ alert('onClosed: colorbox has completely closed'); }
+        });
+
+        $('.non-retina').colorbox({rel:'group5', transition:'none'})
+        $('.retina').colorbox({rel:'group5', transition:'none', retinaImage:true, retinaUrl:true});
+
+        //Example of preserving a JavaScript event for inline calls.
+        $("#click").click(function(){
+          $('#click').css({"background-color":"#f00", "color":"#fff", "cursor":"inherit"}).text("Open this window again and this message will still be here.");
+          return false;
+        });
+      });
+    </script>
+
   <script type="text/javascript">
           function submitForm() {
               //alert('test submitForm');
@@ -13,7 +51,7 @@
               fd.append("label", "WEBUPLOAD");
               console.log();
               $.ajax({
-                url: "/segmentation",
+                url: "segmentation",
                 type: "POST",
                 data: fd,
                 enctype: 'multipart/form-data',
@@ -25,6 +63,12 @@
                   // $('#originalImage').html(data.originalImage);
                   $('#originalImage').attr('src', data.originalImage);
                   $('#segmentedImage').attr('src', data.segmentedImage);
+
+                  $('#original>a').attr('href', data.originalImage);
+                  $('#original>a').attr('title', data.originalImage);
+                  $('#segmented>a').attr('href', data.segmentedImage);
+                  $('#segmented>a').attr('title', data.segmentedImage);
+
                   if(typeof(data.msg)!="undefined")
                   {
                     alert(data.msg);
@@ -46,8 +90,9 @@
       <h1>选择文件</h1>
       <div id="uploader">
         <form action="" id="fileinfo" method=post enctype=multipart/form-data onsubmit="return submitForm();">
-        <p><input type=file name=file>
-        <input id="send_upload_request" type=submit value=Upload>
+        <p><input type=file name=file></p>
+        <!-- <input id="send_upload_request" type=submit value=Upload> -->
+        <button type="button" class="btn btn-primary"onclick="return submitForm();">上传分析</button>
         </form>
       </div>
     </div>
@@ -55,14 +100,14 @@
     <div class="col-sm-4">
       <h3>原图像</h3>
       <div id="original">
-        <img id="originalImage" width="300" height="300"/>
+        <a href="#" title="#" class="group4"><img id="originalImage" width="300" height="300"/></a>
       </div>
     </div>
 
     <div class="col-sm-4">
       <h3>分割后的图像</h3>
       <div id="segmented">
-        <img id="segmentedImage" width="300" height="300"/>
+        <a href="#" title="#" class="group4"><img id="segmentedImage" width="300" height="300"/></a>
       </div>
     </div>
   </div>

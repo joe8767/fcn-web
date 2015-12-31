@@ -1,20 +1,83 @@
 {% extends "layout.html" %}
-{% block title %}细胞图像分析{% endblock %}
+{% block title %}细胞序列图像分析{% endblock %}
 {% block head %}
   {{ super() }}
-  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+  <style type="text/css">
+    #imageList ul{margin: 0; padding: 0; }
+    #imageList ul li{list-style: none; float:left; margin: 10px;}
+    #imageList ul li img{list-style: none; float:left; margin: 10px; height:120px; width: 120px;}
+  </style>
+  <script type="text/javascript" src="{{ url_for('static', filename='jquery/jquery.js') }}"></script>
+  <script type="text/javascript"> var $SCRIPT_ROOT = {{ request.script_root|tojson|safe}}; </script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" type="text/css" media="screen">
   <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+
+  <!-- <script src="{{ url_for('static', filename='thickbox/thickbox.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='thickbox/thickbox.css') }}" type="text/css" media="screen"> -->
+
+  <script src="{{ url_for('static', filename='colorbox/jquery.colorbox.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='colorbox/colorbox.css') }}" type="text/css" media="screen">
+
+  <script>
+			$(document).ready(function(){
+				//Examples of how to assign the Colorbox event to elements
+				$(".group1").colorbox({rel:'group1'});
+				$(".group2").colorbox({rel:'group2', transition:"fade"});
+				$(".group3").colorbox({rel:'group3', transition:"none", width:"75%", height:"75%"});
+				$(".group4").colorbox({rel:'group4', slideshow:true});
+				$(".ajax").colorbox();
+				$(".youtube").colorbox({iframe:true, innerWidth:640, innerHeight:390});
+				$(".vimeo").colorbox({iframe:true, innerWidth:500, innerHeight:409});
+				$(".iframe").colorbox({iframe:true, width:"80%", height:"80%"});
+				$(".inline").colorbox({inline:true, width:"50%"});
+				$(".callbacks").colorbox({
+					onOpen:function(){ alert('onOpen: colorbox is about to open'); },
+					onLoad:function(){ alert('onLoad: colorbox has started to load the targeted content'); },
+					onComplete:function(){ alert('onComplete: colorbox has displayed the loaded content'); },
+					onCleanup:function(){ alert('onCleanup: colorbox has begun the close process'); },
+					onClosed:function(){ alert('onClosed: colorbox has completely closed'); }
+				});
+
+				$('.non-retina').colorbox({rel:'group5', transition:'none'})
+				$('.retina').colorbox({rel:'group5', transition:'none', retinaImage:true, retinaUrl:true});
+
+				//Example of preserving a JavaScript event for inline calls.
+				$("#click").click(function(){
+					$('#click').css({"background-color":"#f00", "color":"#fff", "cursor":"inherit"}).text("Open this window again and this message will still be here.");
+					return false;
+				});
+			});
+		</script>
 {% endblock %}
 {% block body %}
 <div class="container">
-  <div class="jumbotron">
-    <h1>细胞图像分析</h1>
-    <p>基于深度神经网络的细胞图像分析</p>
-  </div>
-  <div class="row" style="margin:0 auto; display: table;">
-    <button type="button" style="margin-right:100px" class="btn btn-primary btn-lg" onclick="window.location.href='segmentationView'">分割</button>
 
-    <button type="button" class="btn btn-success btn-lg" onclick="window.location.href='detectionView'">检测</button>
+  <div class="jumbotron">
+    <h1>细胞序列图像分析</h1>
+    <p>基于深度神经网络的细胞序列图像分析</p>
   </div>
+
+  <div class="row" style="margin:0 auto; display: table; background-color: #dedef8;box-shadow:
+       inset 1px -1px 1px #444, inset -1px 1px 1px #444; width:500px; height:100px;" >
+    <button type="button" class="btn btn-primary btn-lg" style="float:left;margin-left:100px; margin-top:20px;" onclick="window.location.href='segmentationView'">分割</button>
+
+    <button type="button" class="btn btn-success btn-lg" style="float:right;margin-right:100px; margin-top:20px;" onclick="window.location.href='detectionView'">检测</button>
+  </div>
+
+  <div class="row" style="margin:0 auto; display: table; margin-top:30px;">
+    <div id="imageList" class="jumbotron" style="background-color: #dedef8;box-shadow:
+         inset 1px -1px 1px #444, inset -1px 1px 1px #444; height:300px;">
+      <p>细胞分裂事件检测示例</p>
+      <ul>
+        <li><a href={{ url_for('static', filename='images/1.png') }} title="{{ url_for('static', filename='images/1.png') }}" class="group4"><img src={{ url_for('static', filename='images/1.png') }} /></a></li>
+        <li><a href={{ url_for('static', filename='images/2.png') }} title="{{ url_for('static', filename='images/2.png') }}" class="group4"><img src={{ url_for('static', filename='images/2.png') }} /></a></li>
+        <li><a href={{ url_for('static', filename='images/3.png') }} title="{{ url_for('static', filename='images/3.png') }}" class="group4"><img src={{ url_for('static', filename='images/3.png') }} /></a></li>
+        <li><a href={{ url_for('static', filename='images/4.png') }} title="{{ url_for('static', filename='images/4.png') }}" class="group4"><img src={{ url_for('static', filename='images/4.png') }} /></a></li>
+        <li><a href={{ url_for('static', filename='images/5.png') }} title="{{ url_for('static', filename='images/5.png') }}" class="group4"><img src={{ url_for('static', filename='images/5.png') }} /></a></li>
+      </ul>
+    </div>
+  </div>
+
 </div>
 {% endblock %}

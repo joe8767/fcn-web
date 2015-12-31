@@ -2,8 +2,16 @@
 {% block title %}细胞分裂检测{% endblock %}
 {% block head %}
   {{ super() }}
+
+  <script type="text/javascript" src="{{ url_for('static', filename='jquery/jquery.js') }}"></script>
+  <script type="text/javascript"> var $SCRIPT_ROOT = {{ request.script_root|tojson|safe}}; </script>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
   <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+
+  <script src="{{ url_for('static', filename='colorbox/jquery.colorbox.js') }}"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='colorbox/colorbox.css') }}" type="text/css" media="screen">
+
   <script type="text/javascript">
           function submitForm() {
               //alert('test submitForm');
@@ -12,7 +20,7 @@
               fd.append("label", "WEBUPLOAD");
               console.log();
               $.ajax({
-                url: "/detection",
+                url: "/upload_multifiles",
                 type: "POST",
                 data: fd,
                 enctype: 'multipart/form-data',
@@ -21,9 +29,16 @@
               }).done(function( data ) {
                   console.log("Flask Output:");
                   console.log( data );
-                  // $('#originalImage').html(data.originalImage);
-                  $('#originalImage').attr('src', data.originalImage);
-                  $('#segmentedImage').attr('src', data.detectedImage);
+                  console.log( data.originalImage.length );
+                  console.log( data.originalImage[0] );
+                  console.log( data.detectedImage[0] );
+                  for(var i=0; i<data.originalImage.length; i++)
+                  {
+                    $('#original>ul').append('<li><a href={{ url_for('static', filename='images/1.png') }} title="{{ url_for('static', filename='images/1.png') }}" class="group4"><img src={{ url_for('static', filename=images/1.png') }} /></a></li>');
+                    $('#originalImage').attr('src', data.originalImage);
+                    $('#segmentedImage').attr('src', data.detectedImage);
+                  }
+
                   if(typeof(data.msg)!="undefined")
                   {
                     alert(data.msg);
@@ -37,6 +52,7 @@
 <div class="container">
   <div class="jumbotron">
     <h1>细胞分裂检测</h1>
+    <h2 style="float:right;"><a href="./">返回首页</a></h2>
     <p>基于深度神经网络的细胞分裂检测</p>
   </div>
   <div class="row">
@@ -45,7 +61,8 @@
       <h1>选择文件</h1>
       <div id="uploader">
         <form action="" id="fileinfo" method=post enctype=multipart/form-data onsubmit="return submitForm();">
-        <p><input type=file name=file>
+        <p><input type=file name=file></p>
+        <p><input type=file name=file></p>
         <input id="send_upload_request" type=submit value=Upload>
         </form>
       </div>
@@ -54,7 +71,9 @@
     <div class="col-sm-4">
       <h3>原图像</h3>
       <div id="original">
-        <img id="originalImage" width="300" height="300"/>
+        <ul>
+          <li><a href={{ url_for('static', filename='images/1.png') }} title="{{ url_for('static', filename='images/1.png') }}" class="group4"><img src={{ url_for('static', filename='images/1.png') }} /></a></li>
+        </ul>
       </div>
     </div>
 

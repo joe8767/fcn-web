@@ -12,8 +12,9 @@ from util.segmentation import segment
 from util.detection import detect
 from util.tif_tools import tif2other
 
-UPLOAD_FOLDER = '/home/joe/Python/flask/fileupload/static/upload'
-SEGMENTED_FOLDER = '/home/joe/Python/flask/fileupload/static/segment'
+PWD = os.getcwd()
+UPLOAD_FOLDER = PWD + '/static/upload'
+SEGMENTED_FOLDER = PWD + '/static/segment'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'tif', 'TIF'])
 
 app = Flask(__name__)
@@ -103,6 +104,37 @@ def upload_file():
             # return render_template('UploadSuccessed.html', uploaded_file_name=filename)
         else:
             return jsonify(msg='不允许上传的文件类型')
+    return 'Something wrong with Upload'
+
+@app.route('/upload_multifiles', methods=['GET', 'POST'])
+def upload_multifiles():
+    if request.method == 'POST':
+        # corresponding to the "name" attribute of "input" from web client
+        # import pdb; pdb.set_trace()
+
+        uploaded_files = request.files.getlist('file')
+        originalImagesForClient = []
+        detectedImagesForClient = []
+        for file in uploaded_files:
+            print('file:  {}'.format(file))
+            # filter the empty filenames
+            if file.filename=='':
+                continue
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                uploadedImage = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                file.save(uploadedImage)
+                # segment the imgage uploaded and save it to DstImage location
+                DstImage = os.path.join(app.config['SEGMENTED_FOLDER'], filename)
+                # segment(uploadedImage, DstImage)
+
+                originalImagesForClient.append('static/upload/'+filename)
+                detectedImagesForClient.append('static/detect/'+filename)
+
+                # return render_template('UploadSuccessed.html', uploaded_file_name=filename)
+            else:
+                return jsonify(msg='不允许上传的文件类型')
+        return jsonify(originalImage=originalImagesForClient, detectedImage=detectedImagesForClient)
     return 'Something wrong with Upload'
 
 if __name__=="__main__":
